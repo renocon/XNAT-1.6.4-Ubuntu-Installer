@@ -12,9 +12,7 @@ mkdir xnat_install
 cd xnat_install
 
 
-echo "Concatenating jdk and xnat archives"
-
-cat $loc/jdk-7u79-linux-x64.gz* > jdk-7u79-linux-x64.tar.gz;
+echo "Concatenating xnat archive"
 cat $loc/xnat-1.6.4.zip* > xnat-1.6.4.zip;
 
 echo "unzipping xnat"
@@ -23,21 +21,21 @@ rm xnat-1.6.4.zip;
 cp xnat-1.6.4 xnat;
 rm x-R xnat-1.6.4;
 
-echo "unzipping oracle jdk"
-tar -xzf jdk-7u79-linux-x64.tar.gz;
-rm jdk-7u79-linux-x64.tar.gz;
-cp jdk-7u79-linux-x64 jdk;
-rm -R jdk-7u79-linux-x64;
-
-echo "unzipping tomcat 7"
-unzip $loc/apache-tomcat-7.0.63.zip ./tc7;
-
 echo "preparing maven cache";
-unzip $loc/xnat-maven.zip ~/.maven;
+unzip $loc/xnat-maven.zip ~/.maven;	
+
 
 
 if test "$JAVA_HOME" != $PWD/jdk
 then 
+	echo 'building jdk7 archive';
+	cat $loc/jdk-7u79-linux-x64.gz* > jdk-7u79-linux-x64.tar.gz;
+	echo "unzipping oracle jdk"
+	tar -xzf jdk-7u79-linux-x64.tar.gz;
+	rm jdk-7u79-linux-x64.tar.gz;
+	cp jdk-7u79-linux-x64 jdk;
+	rm -R jdk-7u79-linux-x64;
+	
 	echo "export JAVA_HOME=$PWD/jdk" >> ~/.bashrc;
 	echo "export PATH=$PATH:$JAVA_HOME/bin";
 	export JAVA_HOME=$PWD/jdk;
@@ -52,32 +50,44 @@ fi
 if test "$XNAT_HOME" != $PWD/xnat
 then 
 	echo "export XNAT_HOME=$PWD/xnat" >> ~/.bashrc;
-	echo "export PATH=$PATH:$XNAT_HOME/bin";
+	echo "export PATH=$PATH:$XNAT_HOME/bin" >> ~/.bashrc;
 	export XNAT_HOME=$PWD/xnat;
 	export PATH=$PATH:$XNAT_HOME/bin;
 fi
 
 if test "$CATALINA_HOME" != $PWD/tc7
 then 
+	echo "unzipping tomcat 7"
+	unzip $loc/apache-tomcat-7.0.63.zip ./tc7;
 	echo "export CATALINA_HOME=$PWD/tc7" >> ~/.bashrc;
 	export CATALINA_HOME=$PWD/tc7
 fi
 
-echo "installing postgresql 9.4.4";
-$loc/postgresql-9.4.4-3-linux-x64.run;
+
 
 
 #replace hba_conf
 
 if test "$POSTGRES_HOME" != $PWD/pg944
 then 
+	echo "installing postgresql 9.4.4";	
+	tar -xzf $loc/postgresql-9.4.4-3-linux-x64-binaries.tar.gz;
+	cp -R $loc/postgresql-9.4.4-3-linux-x64-binaries $PWD/pg944;
+	rm -R $loc/postgresql-9.4.4-3-linux-x64-binaries;
 	echo "export POSTGRES_HOME=$PWD/pg944" >> ~/.bashrc;
-	echo "export PATH=$PATH:$POSTGRES_HOME/bin";
+	echo "export PATH=$PATH:$POSTGRES_HOME/bin" >> ~/.bashrc;
 	export POSTGRES_HOME=$PWD/pg944;
 	export PATH=$PATH:$POSTGRES_HOME/bin;
+	mkdir $PWD/pg944/data;
+	echo "export PGDATA=$PWD/pg944/data" >> ~/.bashrc;
+	export PGDATA=$PWD/pg944/data;
+	pg_ctl initdb;
+	rm $PGDATA/pg_hba.conf;
+	cp $loc/pgconf/main/pg_hba.conf $PGDATA/pg_hba.conf;
+	#pg_ctl start;
 fi
 
-pg_ctl restart
+pg_ctl start
 
 echo "Preparing database credentials.";
 echo "Enter XNAT database username: ";
@@ -153,7 +163,6 @@ StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true;
 
 
 echo "enabling tomcat ports in firewall"
-
 ufw allow 8080
 
 echo "starting tomcat"

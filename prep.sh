@@ -8,21 +8,14 @@ loc="$PWD";
 echo $loc
 
 cd ~;
+touch ~/.bashrc;
 mkdir xnat_install
 cd xnat_install
 
 
-echo "Concatenating xnat archive"
-cat $loc/xnat-1.6.4.zip* > xnat-1.6.4.zip;
-
-echo "unzipping xnat"
-unzip xnat-1.6.4.zip;
-rm xnat-1.6.4.zip;
-cp xnat-1.6.4 xnat;
-rm x-R xnat-1.6.4;
-
 echo "preparing maven cache";
-unzip $loc/xnat-maven.zip ~/.maven;	
+rm -R ~/.maven;
+unzip $loc/xnat-maven.zip -d ~/;	
 
 
 
@@ -33,11 +26,12 @@ then
 	echo "unzipping oracle jdk"
 	tar -xzf jdk-7u79-linux-x64.tar.gz;
 	rm jdk-7u79-linux-x64.tar.gz;
-	cp jdk-7u79-linux-x64 jdk;
-	rm -R jdk-7u79-linux-x64;
+	cp -R jdk1.7.0_79 jdk;
+	chmod -R 777 jdk1.7.0_79;
+	rm -R jdk1.7.0_79;
 	
 	echo "export JAVA_HOME=$PWD/jdk" >> ~/.bashrc;
-	echo "export PATH=$PATH:$JAVA_HOME/bin";
+	echo "export PATH=$PATH:$JAVA_HOME/bin" >> ~/.bashrc;
 	export JAVA_HOME=$PWD/jdk;
 	export PATH=$PATH:$JAVA_HOME/bin;
 	update-alternatives --install "/usr/bin/java" "java" "$JAVA_HOME/bin/java" 1;
@@ -49,6 +43,14 @@ fi
 
 if test "$XNAT_HOME" != $PWD/xnat
 then 
+	echo "Concatenating xnat archive"
+	cat $loc/xnat-1.6.4.zip* > xnat-1.6.4.zip;
+
+	echo "unzipping xnat"
+	unzip xnat-1.6.4.zip;
+	rm xnat-1.6.4.zip;
+	cp -R xnat-1.6.4 xnat;
+	rm -R xnat-1.6.4;
 	echo "export XNAT_HOME=$PWD/xnat" >> ~/.bashrc;
 	echo "export PATH=$PATH:$XNAT_HOME/bin" >> ~/.bashrc;
 	export XNAT_HOME=$PWD/xnat;
@@ -58,9 +60,12 @@ fi
 if test "$CATALINA_HOME" != $PWD/tc7
 then 
 	echo "unzipping tomcat 7"
-	unzip $loc/apache-tomcat-7.0.63.zip ./tc7;
+	unzip $loc/apache-tomcat-7.0.63.zip -d ./;
+	cp -R apache-tomcat-7.0.63 tc7;
+	rm -R apache-tomcat-7.0.63;
+	rm -R ./tc7/webapps/*;
 	echo "export CATALINA_HOME=$PWD/tc7" >> ~/.bashrc;
-	export CATALINA_HOME=$PWD/tc7
+	export CATALINA_HOME=$PWD/tc7;
 fi
 
 
@@ -72,8 +77,9 @@ if test "$POSTGRES_HOME" != $PWD/pg944
 then 
 	echo "installing postgresql 9.4.4";	
 	tar -xzf $loc/postgresql-9.4.4-3-linux-x64-binaries.tar.gz;
-	cp -R $loc/postgresql-9.4.4-3-linux-x64-binaries $PWD/pg944;
-	rm -R $loc/postgresql-9.4.4-3-linux-x64-binaries;
+	cp -R pgsql pg944;
+	chmod -R 777 pgsql;
+	rm -R pgsql;
 	echo "export POSTGRES_HOME=$PWD/pg944" >> ~/.bashrc;
 	echo "export PATH=$PATH:$POSTGRES_HOME/bin" >> ~/.bashrc;
 	export POSTGRES_HOME=$PWD/pg944;
@@ -86,8 +92,18 @@ then
 	cp $loc/pgconf/main/pg_hba.conf $PGDATA/pg_hba.conf;
 
 	rm $PGDATA/postgresql.conf;
-	cp $loc/pgconf/main/pg_hba.conf $PGDATA/postgresql.conf;
-	sed -i 's/PG_DATA_PLACE/new/$PGDATA' $PGDATA/postgresql.conf;
+	cp $loc/pgconf/main/postgresql.conf $PGDATA/postgresql.conf;
+
+	#//oldv=/;
+	#newv=\\\\/;
+	awk '{gsub("PG_DATA_PLACE", /$PGDATA/, $0); print}' $PGDATA/postgresql.conf;
+
+
+awk -v pat="PG_DATA_PLACE" '$0 ~ pat { nmatches++ }
+       END { print nmatches, "found" }' $PGDATA/postgresql.conf;
+	#pgtemp="${PGDATA//$oldv/$newv}";
+	#echo $pgtemp;
+	#sed -i 's/PG_DATA_PLACE/new/%$pgtemp%' $PGDATA/postgresql.conf;
 	#pg_ctl start;
 fi
 
@@ -171,3 +187,5 @@ ufw allow 8080
 
 echo "starting tomcat"
 $CATALINA_HOME/bin/startup.sh;
+
+echo "Setup Complete. See xnat at $url:8080 and login with username:admin password:admin";

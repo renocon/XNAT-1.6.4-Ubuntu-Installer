@@ -21,7 +21,7 @@ echo "unzipping xnat"
 unzip xnat-1.6.4.zip;
 rm xnat-1.6.4.zip;
 cp xnat-1.6.4 xnat;
-rm x-R nat-1.6.4;
+rm x-R xnat-1.6.4;
 
 echo "unzipping oracle jdk"
 tar -xzf jdk-7u79-linux-x64.tar.gz;
@@ -39,9 +39,14 @@ unzip $loc/xnat-maven.zip ~/.maven;
 if test "$JAVA_HOME" != $PWD/jdk
 then 
 	echo "export JAVA_HOME=$PWD/jdk" >> ~/.bashrc;
-	export JAVA_HOME=$PWD/jdk
-
-	#to-do, change default java
+	echo "export PATH=$PATH:$JAVA_HOME/bin";
+	export JAVA_HOME=$PWD/jdk;
+	export PATH=$PATH:$JAVA_HOME/bin;
+	update-alternatives --install "/usr/bin/java" "java" "$JAVA_HOME/bin/java" 1;
+	update-alternatives --install "/usr/bin/javac" "javac" "$JAVA_HOME/bin/javac" 1;
+	update-alternatives --config java;
+	update-alternatives --config javac;
+	
 fi
 
 if test "$XNAT_HOME" != $PWD/xnat
@@ -62,8 +67,7 @@ echo "installing postgresql 9.4.4";
 $loc/postgresql-9.4.4-3-linux-x64.run;
 
 
-#replace pga_conf
-#add pg_ctl bin to path
+#replace hba_conf
 
 if test "$POSTGRES_HOME" != $PWD/pg944
 then 
@@ -85,6 +89,7 @@ read dbname;
 createdb -U postgres -O $dbuser $dbname;
 
 rm build.properties;
+echo "Preparing build.properties";
 echo "#xnat build properties generated from script" >> build.properties;
 echo "maven.appserver.home = $PWD/tc7" >> build.properties;
 echo "xdat.project.name=ROOT" >> build.properties;

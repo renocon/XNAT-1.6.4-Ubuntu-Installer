@@ -84,6 +84,10 @@ then
 	pg_ctl initdb;
 	rm $PGDATA/pg_hba.conf;
 	cp $loc/pgconf/main/pg_hba.conf $PGDATA/pg_hba.conf;
+
+	rm $PGDATA/postgresql.conf;
+	cp $loc/pgconf/main/pg_hba.conf $PGDATA/postgresql.conf;
+	sed -i 's/PG_DATA_PLACE/new/$PGDATA' $PGDATA/postgresql.conf;
 	#pg_ctl start;
 fi
 

@@ -89,6 +89,7 @@ read dbname;
 createdb -U postgres -O $dbuser $dbname;
 
 rm build.properties;
+touch build.properties;
 echo "Preparing build.properties";
 echo "#xnat build properties generated from script" >> build.properties;
 echo "maven.appserver.home = $PWD/tc7" >> build.properties;

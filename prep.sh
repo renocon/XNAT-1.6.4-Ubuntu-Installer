@@ -73,41 +73,37 @@ fi
 
 #replace hba_conf
 
-if test "$POSTGRES_HOME" != $PWD/pg944
-then 
-	echo "installing postgresql 9.4.4";	
-	tar -xzf $loc/postgresql-9.4.4-3-linux-x64-binaries.tar.gz;
-	cp -R pgsql pg944;
-	chmod -R 777 pgsql;
-	rm -R pgsql;
-	echo "export POSTGRES_HOME=$PWD/pg944" >> ~/.bashrc;
-	echo "export PATH=$PATH:$POSTGRES_HOME/bin" >> ~/.bashrc;
-	export POSTGRES_HOME=$PWD/pg944;
-	export PATH=$PATH:$POSTGRES_HOME/bin;
-	mkdir $PWD/pg944/data;
-	echo "export PGDATA=$PWD/pg944/data" >> ~/.bashrc;
-	export PGDATA=$PWD/pg944/data;
-	pg_ctl initdb;
-	rm $PGDATA/pg_hba.conf;
-	cp $loc/pgconf/main/pg_hba.conf $PGDATA/pg_hba.conf;
+#if test "$POSTGRES_HOME" != $PWD/pg944
+#then 
+#	echo "installing postgresql 9.4.4";	
+#	tar -xzf $loc/postgresql-9.4.4-3-linux-x64-binaries.tar.gz;
+#	cp -R pgsql pg944;
+#	chmod -R 777 pgsql;
+#	rm -R pgsql;
+#	echo "export POSTGRES_HOME=$PWD/pg944" >> ~/.bashrc;
+#	echo "export PATH=$PATH:$POSTGRES_HOME/bin" >> ~/.bashrc;
+#	export POSTGRES_HOME=$PWD/pg944;
+#	export PATH=$PATH:$POSTGRES_HOME/bin;
+#	mkdir $PWD/pg944/data;
+#	echo "export PGDATA=$PWD/pg944/data" >> ~/.bashrc;
+#	export PGDATA=$PWD/pg944/data;
+#	pg_ctl initdb;
+#	rm $PGDATA/pg_hba.conf;
+#	cp $loc/pgconf/main/pg_hba.conf $PGDATA/pg_hba.conf;
 
-	rm $PGDATA/postgresql.conf;
-	cp $loc/pgconf/main/postgresql.conf $PGDATA/postgresql.conf;
-
-	#//oldv=/;
-	#newv=\\\\/;
-	awk '{gsub("PG_DATA_PLACE", /$PGDATA/, $0); print}' $PGDATA/postgresql.conf;
+#	rm $PGDATA/postgresql.conf;
+#	cp $loc/pgconf/main/postgresql.conf $PGDATA/postgresql.conf;
 
 
-awk -v pat="PG_DATA_PLACE" '$0 ~ pat { nmatches++ }
-       END { print nmatches, "found" }' $PGDATA/postgresql.conf;
-	#pgtemp="${PGDATA//$oldv/$newv}";
-	#echo $pgtemp;
-	#sed -i 's/PG_DATA_PLACE/new/%$pgtemp%' $PGDATA/postgresql.conf;
-	#pg_ctl start;
-fi
+#	javac $loc/PgRep.java;
+#	chmod 777 $loc/PgRep.class;
+#	cp $loc/PgRep.class ./PgRep.class;
+#	java PgRep;
+#	rm PgRep.class;
 
-pg_ctl start
+#fi
+
+#pg_ctl start
 
 echo "Preparing database credentials.";
 echo "Enter XNAT database username: ";

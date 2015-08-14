@@ -23,7 +23,7 @@ export dbpw=xnat
 
 echo "Enter XNAT database port: "
 #read dbpw;
-export port=5433
+export port=5432
 
 echo "Where will XNAT be hosted? (eg. http://myxnat.com or http://localhost) Do not put the port as it will appended automatically."
 #read url;
@@ -100,8 +100,12 @@ then
 fi
 
 
+if [! -f /usr/bin/psql];
+then
+	sudo apt-get install postgres postgres-contrib pgadmin3
 
 
+fi
 #replace hba_conf
 
 #if test "$POSTGRES_HOME" != $PWD/pg944
@@ -135,12 +139,13 @@ fi
 #fi
 
 #pg_ctl start
-
-
+#sudo -i -u postgres
 #createuser -U postgres -S -D -R -P $dbuser
-
-
 #createdb -U postgres -O $dbuser $dbname
+
+
+
+#exit
 
 rm build.properties
 touch build.properties

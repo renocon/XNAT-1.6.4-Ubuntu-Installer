@@ -140,8 +140,10 @@ fi
 
 #pg_ctl start
 #sudo -i -u postgres
-#createuser -U postgres -S -D -R -P $dbuser
-#createdb -U postgres -O $dbuser $dbname
+sudo su - postgres -c "createuser -U postgres -S -D -R -P $dbuser"
+sudo su - postgres -c "createdb -U postgres -O $dbuser $dbname"
+#
+#
 
 
 
@@ -217,11 +219,14 @@ bash ./bin/setup.sh -Ddeploy=true
 
 echo "Populating Database Schema"
 cd deployments/xnat
-psql -d $dbname -f sql/xnat.sql -U $dbuser
+sudo su - postgres -c "psql -d $dbname -f sql/xnat.sql -U $dbuser"
+
 
 echo "Creating default user admin"
-~/xnat_install/xnat/bin/StoreXML -l security/security.xml -allowDataDeletion true
-~/xnat_install/xnat/bin/StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true
+sudo su - postgres -c "StoreXML -l security/security.xml -allowDataDeletion true"
+
+sudo su - postgres -c "StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true"
+
 
 
 echo "enabling tomcat ports in firewall"

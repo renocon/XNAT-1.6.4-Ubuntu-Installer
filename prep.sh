@@ -27,7 +27,7 @@ export port=5432
 
 echo "Where will XNAT be hosted? (eg. http://myxnat.com or http://localhost) Do not put the port as it will appended automatically."
 #read url;
-export url=http://localhost
+export url=http://localhost/xnat
 
 echo "Initializing Directories..."
 loc="$PWD"
@@ -81,8 +81,8 @@ then
 	cp -R xnat-1.6.4 xnat
 	sudo chmod -R 777 xnat
 	rm -R xnat-1.6.4
-	sudo echo "export XNAT_HOME=$PWD/xnat" >> ~/.bashrc
-	sudo echo "export PATH=$PATH:$XNAT_HOME/bin" >> ~/.bashrc
+	echo "export XNAT_HOME=$PWD/xnat" >> ~/.bashrc
+	echo "export PATH=$PATH:$XNAT_HOME/bin" >> ~/.bashrc
 	export XNAT_HOME=$PWD/xnat
 	export PATH=$PATH:$XNAT_HOME/bin
 fi
@@ -100,12 +100,12 @@ then
 fi
 
 
-if [! -f /usr/bin/psql];
-then
-	sudo apt-get install postgres postgres-contrib pgadmin3
+#if [! -f /usr/bin/psql];
+#then
+	#sudo apt-get install postgres postgres-contrib pgadmin3
 
 
-fi
+#fi
 #replace hba_conf
 
 #if test "$POSTGRES_HOME" != $PWD/pg944
@@ -140,8 +140,8 @@ fi
 
 #pg_ctl start
 #sudo -i -u postgres
-sudo su - postgres -c "createuser -U postgres -S -D -R -P $dbuser"
-sudo su - postgres -c "createdb -U postgres -O $dbuser $dbname"
+#sudo su - postgres -c "createuser -U postgres -S -D -R -P $dbuser"
+#sudo su - postgres -c "createdb -U postgres -O $dbuser $dbname"
 #
 #
 
@@ -219,22 +219,24 @@ bash ./bin/setup.sh -Ddeploy=true
 
 echo "Populating Database Schema"
 cd deployments/xnat
-sudo su - postgres -c "psql -d $dbname -f sql/xnat.sql -U $dbuser"
+#sudo su - postgres -c "psql -d $dbname -f sql/xnat.sql -U $dbuser"
 
 
 echo "Creating default user admin"
-sudo su - postgres -c "StoreXML -l security/security.xml -allowDataDeletion true"
+#sudo su - postgres -c "StoreXML -l security/security.xml -allowDataDeletion true"
+#StoreXML -l security/security.xml -allowDataDeletion true
 
-sudo su - postgres -c "StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true"
+#sudo su - postgres -c "StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true"
+#StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true
 
 
 
 echo "enabling tomcat ports in firewall"
 ufw allow 8080
 
-echo "starting tomcat"
-bash $CATALINA_HOME/bin/shutdown.sh
-bash $CATALINA_HOME/bin/startup.sh
+#echo "starting tomcat"
+#bash $CATALINA_HOME/bin/shutdown.sh
+#bash $CATALINA_HOME/bin/startup.sh
 
 echo "Setup Complete. See xnat at $url:8080 and login with username:admin password:admin"
 

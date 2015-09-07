@@ -5,29 +5,29 @@ clear
 
 
 echo "Beginning XNAT setup. Everything will be installed into ~/xnat-install."
-echo "This script will install apache tomcat7, oracle jdk7, postgresql 9.4.4 and xnat"
+echo "This script will install apache tomcat7, oracle jdk7 and xnat. It assumes postgresql is already set up."
 echo "Press ctrl+c to quit at any time."
 
 echo "Preparing database credentials."
 echo "Enter XNAT database username: "
-#read dbuser;
-export dbuser=xnat01
+read dbuser;
+#export dbuser=xnat01
 
 echo "Enter XNAT database name: "
-#read dbname;
-export dbname=xnat
+read dbname;
+#export dbname=xnat
 
 echo "Enter XNAT database password: "
-#read dbpw;
-export dbpw=xnat
+read dbpw;
+#export dbpw=xnat
 
 echo "Enter XNAT database port: "
-#read dbpw;
-export port=5432
+read port;
+#export port=5432
 
 echo "Where will XNAT be hosted? (eg. http://myxnat.com or http://localhost) Do not put the port as it will appended automatically."
-#read url;
-export url=http://localhost/xnat
+read url;
+#export url=http://localhost/xnat
 
 echo "Initializing Directories..."
 loc="$PWD"
@@ -100,54 +100,7 @@ then
 fi
 
 
-#if [! -f /usr/bin/psql];
-#then
-	#sudo apt-get install postgres postgres-contrib pgadmin3
 
-
-#fi
-#replace hba_conf
-
-#if test "$POSTGRES_HOME" != $PWD/pg944
-#then 
-#	echo "installing postgresql 9.4.4";	
-#	tar -xzf $loc/postgresql-9.4.4-3-linux-x64-binaries.tar.gz;
-#	cp -R pgsql pg944;
-#	sudo chmod -R 777 pgsql;
-#	rm -R pgsql;
-#	echo "export POSTGRES_HOME=$PWD/pg944" >> ~/.bashrc;
-#	echo "export PATH=$PATH:$POSTGRES_HOME/bin" >> ~/.bashrc;
-#	export POSTGRES_HOME=$PWD/pg944;
-#	export PATH=$PATH:$POSTGRES_HOME/bin;
-#	mkdir $PWD/pg944/data;
-#	echo "export PGDATA=$PWD/pg944/data" >> ~/.bashrc;
-#	export PGDATA=$PWD/pg944/data;
-#	pg_ctl initdb;
-#	rm $PGDATA/pg_hba.conf;
-#	cp $loc/pgconf/main/pg_hba.conf $PGDATA/pg_hba.conf;
-
-#	rm $PGDATA/postgresql.conf;
-#	cp $loc/pgconf/main/postgresql.conf $PGDATA/postgresql.conf;
-
-
-#	javac $loc/PgRep.java;
-#	sudo chmod 777 $loc/PgRep.class;
-#	cp $loc/PgRep.class ./PgRep.class;
-#	java PgRep;
-#	rm PgRep.class;
-
-#fi
-
-#pg_ctl start
-#sudo -i -u postgres
-#sudo su - postgres -c "createuser -U postgres -S -D -R -P $dbuser"
-#sudo su - postgres -c "createdb -U postgres -O $dbuser $dbname"
-#
-#
-
-
-
-#exit
 
 rm build.properties
 touch build.properties
@@ -222,12 +175,12 @@ cd deployments/xnat
 #sudo su - postgres -c "psql -d $dbname -f sql/xnat.sql -U $dbuser"
 
 
-echo "Creating default user admin"
+#echo "Creating default user admin"
 #sudo su - postgres -c "StoreXML -l security/security.xml -allowDataDeletion true"
-#StoreXML -l security/security.xml -allowDataDeletion true
+StoreXML -l security/security.xml -allowDataDeletion true
 
 #sudo su - postgres -c "StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true"
-#StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true
+StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true
 
 
 
@@ -235,8 +188,8 @@ echo "enabling tomcat ports in firewall"
 ufw allow 8080
 
 #echo "starting tomcat"
-#bash $CATALINA_HOME/bin/shutdown.sh
-#bash $CATALINA_HOME/bin/startup.sh
+bash $CATALINA_HOME/bin/shutdown.sh
+bash $CATALINA_HOME/bin/startup.sh
 
 echo "Setup Complete. See xnat at $url:8080 and login with username:admin password:admin"
 

@@ -10,20 +10,20 @@ echo "Press ctrl+c to quit at any time."
 
 echo "Preparing database credentials."
 echo "Enter XNAT database username: "
-read dbuser;
-#export dbuser=xnat01
+#read dbuser;
+export dbuser=xnat01
 
 echo "Enter XNAT database name: "
-read dbname;
-#export dbname=xnat
+#read dbname;
+export dbname=xnat
 
 echo "Enter XNAT database password: "
-read dbpw;
-#export dbpw=xnat
+#read dbpw;
+export dbpw=xnatpw
 
 echo "Enter XNAT database port: "
-read port;
-#export port=5432
+#read port;
+export port=5432
 
 echo "Where will XNAT be hosted? (eg. http://myxnat.com or http://localhost) Do not put the port as it will appended automatically."
 read url;
@@ -57,10 +57,11 @@ then
 	sudo sudo chmod -R 777 jdk1.7.0_79
 	sudo rm -R jdk1.7.0_79
 	
-	echo "export JAVA_HOME=$PWD/jdk" >> ~/.bashrc
-	echo "export PATH=$PATH:$JAVA_HOME/bin" >> ~/.bashrc
 	export JAVA_HOME=$PWD/jdk
 	export PATH=$PATH:$JAVA_HOME/bin
+	echo "export JAVA_HOME=$PWD/jdk" >> ~/.bashrc
+	echo "export PATH=$PATH:$PWD/jdk/bin" >> ~/.bashrc
+	
 	sudo touch /usr/bin/java;
 	sudo touch /usr/bin/javac;
 	sudo update-alternatives --install "/usr/bin/java" "java" "$JAVA_HOME/bin/java" 1
@@ -81,10 +82,11 @@ then
 	cp -R xnat-1.6.4 xnat
 	sudo chmod -R 777 xnat
 	rm -R xnat-1.6.4
-	echo "export XNAT_HOME=$PWD/xnat" >> ~/.bashrc
-	echo "export PATH=$PATH:$XNAT_HOME/bin" >> ~/.bashrc
 	export XNAT_HOME=$PWD/xnat
 	export PATH=$PATH:$XNAT_HOME/bin
+	echo "export XNAT_HOME=$PWD/xnat" >> ~/.bashrc
+	echo "export PATH=$PATH:$PWD/xnat/bin" >> ~/.bashrc
+	
 fi
 
 if [ ! -d $PWD/tc7 ]; 
@@ -126,7 +128,7 @@ echo "xdat.prearchive.location=$PWD/data/prearchive" >> build.properties
 echo "xdat.cache.location=$PWD/data/cache" >> build.properties
 echo "xdat.ftp.location=$PWD/data/ftp" >> build.properties
 echo "xdat.build.location=$PWD/data/build" >> build.properties
-echo "xdat.pipeline.location=$PWD/data/pipeline" >> build.properties
+echo "xdat.pipeline.location=$PWD/xnat/pipeline" >> build.properties
 echo "xdat.mail.server=mail.server" >> build.properties
 echo "xdat.mail.port=25" >> build.properties
 echo "xdat.mail.protocol=smtp" >> build.properties
@@ -139,7 +141,7 @@ echo "xdat.mail.admin=administrator@xnat.org" >> build.properties
 echo "xdat.mail.prefix=XNAT" >> build.properties
 
 
-echo "xdat.url=$url:8080" >> build.properties
+echo "xdat.url=$url" >> build.properties
 echo "xdat.require_login=true" >> build.properties
 echo "xdat.enable_new_registrations=false" >> build.properties
 echo "xdat.security.channel=any" >> build.properties
@@ -185,11 +187,11 @@ StoreXML -dir ./work/field_groups -u admin -p admin -allowDataDeletion true
 
 
 echo "enabling tomcat ports in firewall"
-ufw allow 8080
+sudo ufw allow 8080
 
 #echo "starting tomcat"
 bash $CATALINA_HOME/bin/shutdown.sh
 bash $CATALINA_HOME/bin/startup.sh
 
-echo "Setup Complete. See xnat at $url:8080 and login with username:admin password:admin"
+echo "Setup Complete. See xnat at $url and login with username:admin password:admin"
 
